@@ -1,0 +1,29 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredPackages">
+        <value>
+          <list size="4">
+            <item index="0" class="java.lang.String" itemvalue="timm" />
+            <item index="1" class="java.lang.String" itemvalue="torch" />
+            <item index="2" class="java.lang.String" itemvalue="torchvision" />
+            <item index="3" class="java.lang.String" itemvalue="submitit" />
+          </list>
+        </value>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="updated_network.Container" />
+          <option value="cv2.equalizeHist" />
+          <option value="cv2.merge" />
+          <option value="cv2.split" />
+          <option value="cv2.*" />
+          <option value="list.eval" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>

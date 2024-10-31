@@ -3,11 +3,12 @@ from glob import glob
 import torch
 import numpy as np
 import imageio as io
-from model import Srnet
+# from model import Srnet
+from model.model import Srnet
 
 TEST_BATCH_SIZE = 40
-COVER_PATH = "/path/to/cover/images/"
-STEGO_PATH = "/path/to/stego/images/"
+COVER_PATH = "data/cover/images/"
+STEGO_PATH = "data/stego/images/"
 CHKPT = "./checkpoints/Srnet_model_weights.pt"
 
 cover_image_names = glob(COVER_PATH)
