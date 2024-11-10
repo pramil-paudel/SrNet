@@ -63,8 +63,8 @@ if __name__ == "__main__":
 
     # model creation and initialization.
     model = Srnet()
-    model.to(device)
     model = model.apply(weights_init)
+    model.to(device)
 
     # Loss function and Optimizer
     loss_fn = nn.NLLLoss()
