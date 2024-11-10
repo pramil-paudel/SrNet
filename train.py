@@ -104,6 +104,7 @@ if __name__ == "__main__":
         adjust_learning_rate(optimizer, epoch)
 
         for i, train_batch in enumerate(train_loader):
+            train_batch = train_batch.to(device)
             images = torch.cat((train_batch["cover"], train_batch["stego"]), 0)
             labels = torch.cat(
                 (train_batch["label"][0], train_batch["label"][1]), 0
