@@ -1,9 +1,10 @@
 #!/bin/bash
-#!/bin/bash
-#SBATCH -p gpu
-#SBATCH --gres="gpu:k20:1"
-#SBATCH -c 4
-#SBATCH --mem=32G
+#SBATCH -p intel
+#SBATCH -N 1
+#SBATCH -n 1
+#SBATCH -c 1
+#SBATCH --mem=1G
+#SBATCH -t 00:20:00
 #SBATCH --time=48:00:00
 #SBATCH -J SRNET
 #SBATCH -o slurm-%j.out
