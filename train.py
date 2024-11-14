@@ -104,17 +104,26 @@ if __name__ == "__main__":
         adjust_learning_rate(optimizer, epoch)
 
         for i, train_batch in enumerate(train_loader):
-            train_batch = train_batch.to(device)
-            images = torch.cat((train_batch["cover"], train_batch["stego"]), 0)
-            labels = torch.cat(
-                (train_batch["label"][0], train_batch["label"][1]), 0
-            )
+            # Move individual components of the dictionary to the device
+            cover = train_batch["cover"].to(device)
+            stego = train_batch["stego"].to(device)
+            label_0 = train_batch["label"][0].to(device)
+            label_1 = train_batch["label"][1].to(device)
+
+            # Concatenate the cover and stego images, as well as the labels
+            images = torch.cat((cover, stego), 0)
+            labels = torch.cat((label_0, label_1), 0)
+
+            # Ensure images and labels are in the correct data types
             images = images.to(device, dtype=torch.float)
             labels = labels.to(device, dtype=torch.long)
+
+            # Forward pass
             optimizer.zero_grad()
             outputs = model(images)
             loss = loss_fn(outputs, labels)
             loss.backward()
+            optimizer.step()
 
             optimizer.step()
             training_loss.append(loss.item())
