@@ -5,7 +5,7 @@ from model.model import Srnet
 import torch
 import numpy as np
 import matplotlib
- # Set the backend to Agg
+# Set the backend to Agg
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
@@ -13,12 +13,19 @@ import seaborn as sns
 from skimage import io
 
 TEST_BATCH_SIZE = 40
-COVER_PATH = "/Users/patthar/Documents/RESEARCH_TWO/Zhu-Net/data/test_cover"
-STEGO_PATH = "/Users/patthar/Documents/RESEARCH_TWO/Zhu-Net/data/test_cover"
+COVER_PATH = "/scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/cover_test"
+STEGO_PATH = "/scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/container_test"
 CHKPT = "/scratch/p522p287/CODE/SrNet/checkpoints/net_100.pt"
 
 cover_image_names = glob(COVER_PATH)
 stego_image_names = glob(STEGO_PATH)
+
+# Check if any images were found
+if len(cover_image_names) == 0 or len(stego_image_names) == 0:
+    print("No images found in the specified paths.")
+else:
+    print(f"Number of cover images: {len(cover_image_names)}")
+    print(f"Number of stego images: {len(stego_image_names)}")
 
 cover_labels = np.zeros((len(cover_image_names)))
 stego_labels = np.ones((len(stego_image_names)))
@@ -41,6 +48,10 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     cover_batch = cover_image_names[idx : idx + TEST_BATCH_SIZE // 2]
     stego_batch = stego_image_names[idx : idx + TEST_BATCH_SIZE // 2]
 
+    # Skip empty batches
+    if len(cover_batch) == 0 or len(stego_batch) == 0:
+        continue
+
     batch = []
     batch_labels = []
 
@@ -55,13 +66,19 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
             batch.append(cover_batch[yi])
             batch_labels.append(0)
             yi += 1
+
     # pylint: disable=E1101
     images = torch.zeros((TEST_BATCH_SIZE, 1, 128, 128), dtype=torch.float).cuda()
     for i in range(TEST_BATCH_SIZE):
-        images[i, 0, :, :] = torch.tensor(io.imread(batch[i])).cuda()
+        try:
+            images[i, 0, :, :] = torch.tensor(io.imread(batch[i])).cuda()
+        except Exception as e:
+            print(f"Error loading image {batch[i]}: {e}")
+            continue  # Skip this image if there's an issue
     image_tensor = images.cuda()
     batch_labels = torch.tensor(batch_labels, dtype=torch.long).cuda()
     # pylint: enable=E1101
+
     outputs = model(image_tensor)
     prediction = outputs.data.max(1)[1]
 
