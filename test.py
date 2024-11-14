@@ -77,25 +77,30 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     all_labels.append(batch_labels.cpu().numpy())
     all_probs.append(probs[:, 1].cpu().numpy() if probs.ndim > 1 else probs.cpu().numpy())
 
-# Flatten lists to create arrays
-all_labels = np.concatenate(all_labels)
-all_probs = np.concatenate(all_probs)
+# Check if all_labels or all_probs are empty
+if len(all_labels) == 0 or len(all_probs) == 0:
+    print("No data available for ROC calculation.")
+else:
+    # Flatten lists to create arrays
+    all_labels = np.concatenate(all_labels)
+    all_probs = np.concatenate(all_probs)
 
-# Compute ROC curve and AUC for binary classification
-fpr, tpr, _ = roc_curve(all_labels, all_probs)
-roc_auc = auc(fpr, tpr)
-plt.figure(figsize=(10, 8))  # Set figure size
-colors = sns.color_palette("husl", 1)  # Use a color palette from Seaborn
-plt.plot(fpr, tpr, color=colors[0], lw=2, label='Binary Class (AUC = {:.2f})'.format(roc_auc))
+    # Compute ROC curve and AUC for binary classification
+    fpr, tpr, _ = roc_curve(all_labels, all_probs)
+    roc_auc = auc(fpr, tpr)
+    plt.figure(figsize=(10, 8))  # Set figure size
+    colors = sns.color_palette("husl", 1)  # Use a color palette from Seaborn
+    plt.plot(fpr, tpr, color=colors[0], lw=2, label='Binary Class (AUC = {:.2f})'.format(roc_auc))
 
-plt.plot([0, 1], [0, 1], 'k--', lw=2)  # Diagonal line
-plt.xlim([0.0, 1.0])
-plt.ylim([0.0, 1.05])
-plt.xlabel('False Positive Rate', fontsize=14)
-plt.ylabel('True Positive Rate', fontsize=14)
-plt.title('Receiver Operating Characteristic (ROC) Curve', fontsize=16)
-plt.legend(loc='lower right', fontsize=12)
-plt.grid(True)
-plt.tight_layout()
-plt.savefig('roc_curve_test.png')  # Save the plot to a file
-print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):%.2f}")
+    plt.plot([0, 1], [0, 1], 'k--', lw=2)  # Diagonal line
+    plt.xlim([0.0, 1.0])
+    plt.ylim([0.0, 1.05])
+    plt.xlabel('False Positive Rate', fontsize=14)
+    plt.ylabel('True Positive Rate', fontsize=14)
+    plt.title('Receiver Operating Characteristic (ROC) Curve', fontsize=16)
+    plt.legend(loc='lower right', fontsize=12)
+    plt.grid(True)
+    plt.tight_layout()
+    plt.savefig('roc_curve_test.png')  # Save the plot to a file
+
+print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):.2f}")
