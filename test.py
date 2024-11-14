@@ -1,15 +1,21 @@
 """This module is used to test the Srnet model."""
 from glob import glob
-import torch
-import numpy as np
-import imageio as io
 # from model import Srnet
 from model.model import Srnet
+import torch
+import numpy as np
+import matplotlib
+ # Set the backend to Agg
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
+from sklearn.metrics import roc_curve, auc
+import seaborn as sns
+from skimage import io
 
 TEST_BATCH_SIZE = 40
-COVER_PATH = "data/cover/images/"
-STEGO_PATH = "data/stego/images/"
-CHKPT = "./checkpoints/Srnet_model_weights.pt"
+COVER_PATH = "/Users/patthar/Documents/RESEARCH_TWO/Zhu-Net/data/test_cover"
+STEGO_PATH = "/Users/patthar/Documents/RESEARCH_TWO/Zhu-Net/data/test_cover"
+CHKPT = "/scratch/p522p287/CODE/SrNet/checkpoints/net_100.pt"
 
 cover_image_names = glob(COVER_PATH)
 stego_image_names = glob(STEGO_PATH)
@@ -25,6 +31,11 @@ model.load_state_dict(ckpt["model_state_dict"])
 images = torch.empty((TEST_BATCH_SIZE, 1, 256, 256), dtype=torch.float)
 # pylint: enable=E1101
 test_accuracy = []
+test_loss = 0
+correct = 0
+all_labels = []
+all_probs = []
+class_counts = {0: 0, 1: 0}
 
 for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     cover_batch = cover_image_names[idx : idx + TEST_BATCH_SIZE // 2]
@@ -45,6 +56,7 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
             batch_labels.append(0)
             yi += 1
     # pylint: disable=E1101
+    images = torch.zeros((TEST_BATCH_SIZE, 1, 128, 128), dtype=torch.float).cuda()
     for i in range(TEST_BATCH_SIZE):
         images[i, 0, :, :] = torch.tensor(io.imread(batch[i])).cuda()
     image_tensor = images.cuda()
@@ -60,4 +72,30 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     )
     test_accuracy.append(accuracy.item())
 
+    # Store labels and probabilities for ROC
+    probs = torch.softmax(outputs, dim=1)  # Use softmax for class probabilities
+    all_labels.append(batch_labels.cpu().numpy())
+    all_probs.append(probs[:, 1].cpu().numpy() if probs.ndim > 1 else probs.cpu().numpy())
+
+# Flatten lists to create arrays
+all_labels = np.concatenate(all_labels)
+all_probs = np.concatenate(all_probs)
+
+# Compute ROC curve and AUC for binary classification
+fpr, tpr, _ = roc_curve(all_labels, all_probs)
+roc_auc = auc(fpr, tpr)
+plt.figure(figsize=(10, 8))  # Set figure size
+colors = sns.color_palette("husl", 1)  # Use a color palette from Seaborn
+plt.plot(fpr, tpr, color=colors[0], lw=2, label='Binary Class (AUC = {:.2f})'.format(roc_auc))
+
+plt.plot([0, 1], [0, 1], 'k--', lw=2)  # Diagonal line
+plt.xlim([0.0, 1.0])
+plt.ylim([0.0, 1.05])
+plt.xlabel('False Positive Rate', fontsize=14)
+plt.ylabel('True Positive Rate', fontsize=14)
+plt.title('Receiver Operating Characteristic (ROC) Curve', fontsize=16)
+plt.legend(loc='lower right', fontsize=12)
+plt.grid(True)
+plt.tight_layout()
+plt.savefig('roc_curve_test.png')  # Save the plot to a file
 print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):%.2f}")
