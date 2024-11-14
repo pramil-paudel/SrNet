@@ -103,4 +103,7 @@ else:
     plt.tight_layout()
     plt.savefig('roc_curve_test.png')  # Save the plot to a file
 
-print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):.2f}")
+if len(test_accuracy) > 0:
+    print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):.2f}")
+else:
+    print("No test accuracy available.")
