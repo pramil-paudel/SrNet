@@ -1,16 +1,10 @@
 """This module is used to test the Srnet model."""
 from glob import glob
-# from model import Srnet
-from model.model import Srnet
 import torch
 import numpy as np
-import matplotlib
-# Set the backend to Agg
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
-from sklearn.metrics import roc_curve, auc
-import seaborn as sns
-from skimage import io
+import imageio as io
+# from model import Srnet
+from model.model import Srnet
 
 TEST_BATCH_SIZE = 40
 COVER_PATH = "/scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/cover_test"
@@ -19,13 +13,6 @@ CHKPT = "/scratch/p522p287/CODE/SrNet/checkpoints/net_100.pt"
 
 cover_image_names = glob(COVER_PATH)
 stego_image_names = glob(STEGO_PATH)
-
-# Check if any images were found
-if len(cover_image_names) == 0 or len(stego_image_names) == 0:
-    print("No images found in the specified paths.")
-else:
-    print(f"Number of cover images: {len(cover_image_names)}")
-    print(f"Number of stego images: {len(stego_image_names)}")
 
 cover_labels = np.zeros((len(cover_image_names)))
 stego_labels = np.ones((len(stego_image_names)))
@@ -38,19 +25,10 @@ model.load_state_dict(ckpt["model_state_dict"])
 images = torch.empty((TEST_BATCH_SIZE, 1, 256, 256), dtype=torch.float)
 # pylint: enable=E1101
 test_accuracy = []
-test_loss = 0
-correct = 0
-all_labels = []
-all_probs = []
-class_counts = {0: 0, 1: 0}
 
 for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     cover_batch = cover_image_names[idx : idx + TEST_BATCH_SIZE // 2]
     stego_batch = stego_image_names[idx : idx + TEST_BATCH_SIZE // 2]
-
-    # Skip empty batches
-    if len(cover_batch) == 0 or len(stego_batch) == 0:
-        continue
 
     batch = []
     batch_labels = []
@@ -66,19 +44,12 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
             batch.append(cover_batch[yi])
             batch_labels.append(0)
             yi += 1
-
     # pylint: disable=E1101
-    images = torch.zeros((TEST_BATCH_SIZE, 1, 128, 128), dtype=torch.float).cuda()
     for i in range(TEST_BATCH_SIZE):
-        try:
-            images[i, 0, :, :] = torch.tensor(io.imread(batch[i])).cuda()
-        except Exception as e:
-            print(f"Error loading image {batch[i]}: {e}")
-            continue  # Skip this image if there's an issue
+        images[i, 0, :, :] = torch.tensor(io.imread(batch[i])).cuda()
     image_tensor = images.cuda()
     batch_labels = torch.tensor(batch_labels, dtype=torch.long).cuda()
     # pylint: enable=E1101
-
     outputs = model(image_tensor)
     prediction = outputs.data.max(1)[1]
 
@@ -89,38 +60,4 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     )
     test_accuracy.append(accuracy.item())
 
-    # Store labels and probabilities for ROC
-    probs = torch.softmax(outputs, dim=1)  # Use softmax for class probabilities
-    all_labels.append(batch_labels.cpu().numpy())
-    all_probs.append(probs[:, 1].cpu().numpy() if probs.ndim > 1 else probs.cpu().numpy())
-
-# Check if all_labels or all_probs are empty
-if len(all_labels) == 0 or len(all_probs) == 0:
-    print("No data available for ROC calculation.")
-else:
-    # Flatten lists to create arrays
-    all_labels = np.concatenate(all_labels)
-    all_probs = np.concatenate(all_probs)
-
-    # Compute ROC curve and AUC for binary classification
-    fpr, tpr, _ = roc_curve(all_labels, all_probs)
-    roc_auc = auc(fpr, tpr)
-    plt.figure(figsize=(10, 8))  # Set figure size
-    colors = sns.color_palette("husl", 1)  # Use a color palette from Seaborn
-    plt.plot(fpr, tpr, color=colors[0], lw=2, label='Binary Class (AUC = {:.2f})'.format(roc_auc))
-
-    plt.plot([0, 1], [0, 1], 'k--', lw=2)  # Diagonal line
-    plt.xlim([0.0, 1.0])
-    plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate', fontsize=14)
-    plt.ylabel('True Positive Rate', fontsize=14)
-    plt.title('Receiver Operating Characteristic (ROC) Curve', fontsize=16)
-    plt.legend(loc='lower right', fontsize=12)
-    plt.grid(True)
-    plt.tight_layout()
-    plt.savefig('roc_curve_test.png')  # Save the plot to a file
-
-if len(test_accuracy) > 0:
-    print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):.2f}")
-else:
-    print("No test accuracy available.")
+print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):%.2f}")
