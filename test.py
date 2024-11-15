@@ -84,7 +84,7 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     # Store labels and probabilities for ROC
     probs = torch.softmax(outputs, dim=1)  # Use softmax for class probabilities
     all_labels.append(batch_labels.cpu().numpy())
-    all_probs.append(probs[:, 1].cpu().numpy() if probs.ndim > 1 else probs.cpu().numpy())
+    all_probs.append(probs[:, 1].detach().cpu().numpy() if probs.ndim > 1 else probs.detach().cpu().numpy())
 
 # Check if all_labels or all_probs are empty
 if len(all_labels) == 0 or len(all_probs) == 0:
