@@ -13,8 +13,8 @@ import seaborn as sns
 from skimage import io
 
 TEST_BATCH_SIZE = 40
-COVER_PATH = "/Users/patthar/Documents/RESEARCH_TWO/Zhu-Net/data/test_cover"
-STEGO_PATH = "/Users/patthar/Documents/RESEARCH_TWO/Zhu-Net/data/test_cover"
+COVER_PATH = "/scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/cover_test"
+STEGO_PATH = "/scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/container_test"
 CHKPT = "/scratch/p522p287/CODE/SrNet/checkpoints/net_100.pt"
 
 cover_image_names = glob(f"{COVER_PATH}/*.pgm")
