@@ -1,11 +1,13 @@
 """This module is used to test the Srnet model."""
+import matplotlib
+import numpy as np
+import torch
 from glob import glob
+
 # from model import Srnet
 from model.model import Srnet
-import torch
-import numpy as np
-import matplotlib
- # Set the backend to Agg
+
+# Set the backend to Agg
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
@@ -38,8 +40,8 @@ all_probs = []
 class_counts = {0: 0, 1: 0}
 
 for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
-    cover_batch = cover_image_names[idx : idx + TEST_BATCH_SIZE // 2]
-    stego_batch = stego_image_names[idx : idx + TEST_BATCH_SIZE // 2]
+    cover_batch = cover_image_names[idx: idx + TEST_BATCH_SIZE // 2]
+    stego_batch = stego_image_names[idx: idx + TEST_BATCH_SIZE // 2]
 
     batch = []
     batch_labels = []
@@ -75,9 +77,9 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     prediction = outputs.data.max(1)[1]
 
     accuracy = (
-        prediction.eq(batch_labels.data).sum()
-        * 100.0
-        / (batch_labels.size()[0])
+            prediction.eq(batch_labels.data).sum()
+            * 100.0
+            / (batch_labels.size()[0])
     )
     test_accuracy.append(accuracy.item())
 
@@ -86,33 +88,48 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     all_labels.append(batch_labels.cpu().numpy())
     all_probs.append(probs[:, 1].detach().cpu().numpy() if probs.ndim > 1 else probs.detach().cpu().numpy())
 
-# Check if all_labels or all_probs are empty
 if len(all_labels) == 0 or len(all_probs) == 0:
     print("No data available for ROC calculation.")
 else:
-    # Flatten lists to create arrays
-    all_labels = np.concatenate(all_labels)
-    all_probs = np.concatenate(all_probs)
-
-    # Compute ROC curve and AUC for binary classification
+    # Compute ROC curve and AUC
     fpr, tpr, _ = roc_curve(all_labels, all_probs)
     roc_auc = auc(fpr, tpr)
-    plt.figure(figsize=(10, 8))  # Set figure size
-    colors = sns.color_palette("husl", 1)  # Use a color palette from Seaborn
-    plt.plot(fpr, tpr, color=colors[0], lw=2, label='Binary Class (AUC = {:.2f})'.format(roc_auc))
 
-    plt.plot([0, 1], [0, 1], 'k--', lw=2)  # Diagonal line
+    # === Save ROC data as .pkl ===
+    roc_data = {
+        "fpr": fpr,
+        "tpr": tpr,
+        "auc": roc_auc,
+        "labels": all_labels,
+        "probs": all_probs
+    }
+    with open("roc_data.pkl", "wb") as f:
+        pickle.dump(roc_data, f)
+    print("✅ ROC data saved to roc_data.pkl")
+
+    # === Plot: Black & White, publication quality ===
+    plt.figure(figsize=(6, 5))
+    plt.rcParams.update({
+        "font.family": "serif",
+        "font.size": 12,
+        "axes.labelsize": 12,
+        "axes.titlesize": 13,
+        "legend.fontsize": 11,
+        "xtick.labelsize": 11,
+        "ytick.labelsize": 11
+    })
+
+    plt.plot(fpr, tpr, color='black', linestyle='-', linewidth=2.5, label=f'AUC = {roc_auc:.4f}')
+    plt.plot([0, 1], [0, 1], color='gray', linestyle='--', linewidth=1.5)
+
     plt.xlim([0.0, 1.0])
     plt.ylim([0.0, 1.05])
-    plt.xlabel('False Positive Rate', fontsize=14)
-    plt.ylabel('True Positive Rate', fontsize=14)
-    plt.title('Receiver Operating Characteristic (ROC) Curve', fontsize=16)
-    plt.legend(loc='lower right', fontsize=12)
-    plt.grid(True)
+    plt.xlabel('False Positive Rate')
+    plt.ylabel('True Positive Rate')
+    plt.title('ROC Curve')
+    plt.legend(loc='lower right')
+    plt.grid(True, linestyle=':', linewidth=0.5)
     plt.tight_layout()
-    plt.savefig('roc_curve_test.png')  # Save the plot to a file
+    plt.savefig('roc_curve_paper.png', dpi=300)
 
-if len(test_accuracy) > 0:
-    print(f"test_accuracy = {sum(test_accuracy)/len(test_accuracy):.2f}")
-else:
-    print("No test accuracy available.")
+    print("📊 ROC curve saved as roc_curve_paper.png")
