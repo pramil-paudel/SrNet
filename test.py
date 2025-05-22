@@ -26,7 +26,7 @@ stego_labels = np.ones((len(stego_image_names)))
 model = Srnet().cuda()
 
 ckpt = torch.load(CHKPT)
-model.load_state_dict(ckpt["model_state_dict"])
+model.load_state_dict(ckpt["model_state_dict"], weights_only=False)
 # pylint: disable=E1101
 images = torch.empty((TEST_BATCH_SIZE, 1, 256, 256), dtype=torch.float)
 # pylint: enable=E1101
