@@ -1,51 +1,49 @@
-"""This module is used to test the Srnet model."""
+"""This module is used to test the SrNet model."""
+import os
 import matplotlib
 import numpy as np
 import torch
 from glob import glob
+import pickle
 
-# from model import Srnet
 from model.model import Srnet
 
-# Set the backend to Agg
+# Set the backend to Agg for headless environments
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
-import seaborn as sns
 from skimage import io
 
+# === Config ===
 TEST_BATCH_SIZE = 40
 COVER_PATH = "/scratch/p522p287/DATA/STEN_DATA/COCO_OUT/cover_test"
 STEGO_PATH = "/scratch/p522p287/DATA/STEN_DATA/COCO_OUT/container_test"
 CHKPT = "/scratch/p522p287/CODE/SrNet/checkpoints/net_100.pt"
 
-cover_image_names = glob(f"{COVER_PATH}/*.pgm")
-stego_image_names = glob(f"{STEGO_PATH}/*.pgm")
+# === Collect file paths ===
+cover_image_names = sorted(glob(f"{COVER_PATH}/*.pgm"))
+stego_image_names = sorted(glob(f"{STEGO_PATH}/*.pgm"))
 
-cover_labels = np.zeros((len(cover_image_names)))
-stego_labels = np.ones((len(stego_image_names)))
+assert len(cover_image_names) == len(stego_image_names), "Mismatched number of cover and stego images."
 
+# === Load model ===
 model = Srnet().cuda()
-
 ckpt = torch.load(CHKPT, weights_only=False)
 model.load_state_dict(ckpt["model_state_dict"])
-# pylint: disable=E1101
-images = torch.empty((TEST_BATCH_SIZE, 1, 256, 256), dtype=torch.float)
-# pylint: enable=E1101
+model.eval()
+
+# === Metrics tracking ===
 test_accuracy = []
-test_loss = 0
-correct = 0
 all_labels = []
 all_probs = []
-class_counts = {0: 0, 1: 0}
 
+# === Batch-wise testing ===
 for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
     cover_batch = cover_image_names[idx: idx + TEST_BATCH_SIZE // 2]
     stego_batch = stego_image_names[idx: idx + TEST_BATCH_SIZE // 2]
 
     batch = []
     batch_labels = []
-
     xi = 0
     yi = 0
     for i in range(2 * len(cover_batch)):
@@ -57,45 +55,45 @@ for idx in range(0, len(cover_image_names), TEST_BATCH_SIZE // 2):
             batch.append(cover_batch[yi])
             batch_labels.append(0)
             yi += 1
-    # pylint: disable=E1101
+
     images = torch.zeros((TEST_BATCH_SIZE, 1, 128, 128), dtype=torch.float).cuda()
+
     for i in range(TEST_BATCH_SIZE):
         image_path = batch[i]
         try:
             image = io.imread(image_path)
-            if len(image.shape) == 3:  # Convert RGB to grayscale if necessary
+            if len(image.shape) == 3:
                 image = np.mean(image, axis=2)
+            image = image.astype(np.float32) / 255.0  # Normalize to [0,1]
             images[i, 0, :, :] = torch.tensor(image).cuda()
-        except ValueError as e:
-            print(f"Error loading image {image_path}: {e}")
+        except Exception as e:
+            print(f"❌ Error loading image {image_path}: {e}")
             continue
 
-    image_tensor = images.cuda()
-    batch_labels = torch.tensor(batch_labels, dtype=torch.long).cuda()
-    # pylint: enable=E1101
-    outputs = model(image_tensor)
-    prediction = outputs.data.max(1)[1]
+    with torch.no_grad():
+        batch_labels_tensor = torch.tensor(batch_labels, dtype=torch.long).cuda()
+        outputs = model(images)
+        predictions = outputs.data.max(1)[1]
+        accuracy = (
+            predictions.eq(batch_labels_tensor).sum() * 100.0 / batch_labels_tensor.size()[0]
+        )
+        test_accuracy.append(accuracy.item())
 
-    accuracy = (
-            prediction.eq(batch_labels.data).sum()
-            * 100.0
-            / (batch_labels.size()[0])
-    )
-    test_accuracy.append(accuracy.item())
+        probs = torch.softmax(outputs, dim=1)
+        all_labels.append(batch_labels_tensor.cpu().numpy())
+        all_probs.append(probs[:, 1].detach().cpu().numpy())
 
-    # Store labels and probabilities for ROC
-    probs = torch.softmax(outputs, dim=1)  # Use softmax for class probabilities
-    all_labels.append(batch_labels.cpu().numpy())
-    all_probs.append(probs[:, 1].detach().cpu().numpy() if probs.ndim > 1 else probs.detach().cpu().numpy())
-
+# === Flatten and prepare for ROC ===
 if len(all_labels) == 0 or len(all_probs) == 0:
     print("No data available for ROC calculation.")
 else:
-    # Compute ROC curve and AUC
+    all_labels = np.concatenate(all_labels).ravel()
+    all_probs = np.concatenate(all_probs).ravel()
+
     fpr, tpr, _ = roc_curve(all_labels, all_probs)
     roc_auc = auc(fpr, tpr)
 
-    # === Save ROC data as .pkl ===
+    # === Save ROC data ===
     roc_data = {
         "fpr": fpr,
         "tpr": tpr,
@@ -107,7 +105,7 @@ else:
         pickle.dump(roc_data, f)
     print("✅ ROC data saved to roc_data.pkl")
 
-    # === Plot: Black & White, publication quality ===
+    # === Plot ROC (black & white, publication-ready) ===
     plt.figure(figsize=(6, 5))
     plt.rcParams.update({
         "font.family": "serif",
@@ -130,6 +128,11 @@ else:
     plt.legend(loc='lower right')
     plt.grid(True, linestyle=':', linewidth=0.5)
     plt.tight_layout()
-    plt.savefig('roc_curve_paper.png', dpi=300)
-
+    plt.savefig("roc_curve_paper.png", dpi=300)
     print("📊 ROC curve saved as roc_curve_paper.png")
+
+# === Print final accuracy ===
+if len(test_accuracy) > 0:
+    print(f"🧪 Average test accuracy = {sum(test_accuracy)/len(test_accuracy):.2f}%")
+else:
+    print("No test accuracy available.")
