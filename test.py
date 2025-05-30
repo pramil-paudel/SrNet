@@ -13,6 +13,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from sklearn.metrics import roc_curve, auc
 from skimage import io
+import pickle
 
 # === Config ===
 TEST_BATCH_SIZE = 40
@@ -106,6 +107,17 @@ else:
     print("✅ ROC data saved to roc_data.pkl")
 
     # === Plot ROC (black & white, publication-ready) ===
+    roc_data = {
+        "fpr": fpr,
+        "tpr": tpr,
+        "roc_auc": roc_auc
+    }
+
+    with open("roc_data.pkl", "wb") as f:
+        pickle.dump(roc_data, f)
+
+    print("✅ ROC data saved as 'roc_data.pkl'")
+
     plt.figure(figsize=(6, 5))
     plt.rcParams.update({
         "font.family": "serif",
