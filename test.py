@@ -95,16 +95,16 @@ else:
     roc_auc = auc(fpr, tpr)
 
     # === Save ROC data ===
-    roc_data = {
-        "fpr": fpr,
-        "tpr": tpr,
-        "auc": roc_auc,
-        "labels": all_labels,
-        "probs": all_probs
-    }
-    with open("roc_data.pkl", "wb") as f:
-        pickle.dump(roc_data, f)
-    print("✅ ROC data saved to roc_data.pkl")
+    # roc_data = {
+    #     "fpr": fpr,
+    #     "tpr": tpr,
+    #     "auc": roc_auc,
+    #     "labels": all_labels,
+    #     "probs": all_probs
+    # }
+    # with open("roc_data.pkl", "wb") as f:
+    #     pickle.dump(roc_data, f)
+    # print("✅ ROC data saved to roc_data.pkl")
 
     # === Plot ROC (black & white, publication-ready) ===
     roc_data = {
