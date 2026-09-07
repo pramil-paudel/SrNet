@@ -1,10 +1,11 @@
 #!/bin/bash
-#SBATCH -p gpu
-#SBATCH --gres="gpu:titanxp:1"
-#SBATCH -c 4
-#SBATCH --mem=32G
+#SBATCH -c 1
+#SBATCH --mem=128G
 #SBATCH --time=48:00:00
-#SBATCH -J SRNet
+#SBATCH -J srnet_steganalysis
 #SBATCH -o slurm-%j.out
+#SBATCH -p gpu
+#SBATCH --gres="gpu:a100:1"
 
-python3 train.py --cover_path /scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/cover_train --stego_path /scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/container_train/ --valid_cover_path /scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/cover_validation --valid_stego_path /scratch/p522p287/DATA/STEN_DATA/IMAGE_NET_OUT/SRNET/container_validation
+python3 train.py
+python3 test.py

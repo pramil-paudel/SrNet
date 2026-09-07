@@ -2,15 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1ab75cc9-a3d7-46e7-90ea-0c666dfda32b" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/data/cover/images/0.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/cover/images/1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/cover/images/2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/cover/images/3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/stego/images/0.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/stego/images/1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/stego/images/2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data/stego/images/3.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/SRNET_train.sh" beforeDir="false" afterPath="$PROJECT_DIR$/SRNET_train.sh" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/train.py" beforeDir="false" afterPath="$PROJECT_DIR$/train.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +42,119 @@
       <option name="presentableId" value="Default" />
       <updated>1728325010715</updated>
     </task>
+    <task id="LOCAL-00001" summary="sh file added">
+      <created>1731201555725</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1731201555725</updated>
+    </task>
+    <task id="LOCAL-00002" summary="sh file added">
+      <created>1731201891153</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1731201891153</updated>
+    </task>
+    <task id="LOCAL-00003" summary="intel sh">
+      <created>1731202930200</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1731202930200</updated>
+    </task>
+    <task id="LOCAL-00004" summary="intel sh">
+      <created>1731205381674</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1731205381674</updated>
+    </task>
+    <task id="LOCAL-00005" summary="intel sh">
+      <created>1731205435394</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1731205435394</updated>
+    </task>
+    <task id="LOCAL-00006" summary="trying to run SR-net">
+      <created>1731623945844</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1731623945844</updated>
+    </task>
+    <task id="LOCAL-00007" summary="trying to run SR-net">
+      <created>1731624210746</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1731624210746</updated>
+    </task>
+    <task id="LOCAL-00008" summary="trying to run SR-net">
+      <created>1731625227123</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1731625227123</updated>
+    </task>
+    <task id="LOCAL-00009" summary="trying to run SR-net">
+      <created>1731627342279</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1731627342279</updated>
+    </task>
+    <task id="LOCAL-00010" summary="trying to run SR-net">
+      <created>1731627476146</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1731627476146</updated>
+    </task>
+    <task id="LOCAL-00011" summary="trying to run SR-net">
+      <created>1731627940553</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1731627940553</updated>
+    </task>
+    <task id="LOCAL-00012" summary="Going back to the system">
+      <created>1731628244452</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1731628244452</updated>
+    </task>
+    <task id="LOCAL-00013" summary="Going back to the system">
+      <created>1731628552352</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1731628552352</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Going back to the system">
+      <created>1731628800599</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1731628800599</updated>
+    </task>
+    <task id="LOCAL-00015" summary="Going back to the system">
+      <created>1731628918237</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1731628918237</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="sh file added" />
+    <MESSAGE value="intel sh" />
+    <MESSAGE value="trying to run SR-net" />
+    <MESSAGE value="Going back to the system" />
+    <option name="LAST_COMMIT_MESSAGE" value="Going back to the system" />
   </component>
 </project>
