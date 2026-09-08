@@ -63,7 +63,7 @@ from utils.utils import (
 # Dataset produced by generate_steganalysis_dataset.py. Its layout is
 #   DATA_ROOT/{train,val,test}/{cover,stego}/NNNNNN.png
 # with filenames corresponding one-to-one across cover/ and stego/.
-DATA_ROOT = "/scratch/p522p287/DATA/STEN_DATA_LENSLESS/STEGANALYSIS/imagenet_diffhide/"
+DATA_ROOT = "/home/p522p287/scratch/DATA/STEN_DATA_LENSLESS/STEGANALYSIS/imagenet_diffhide_amp8x/"
 
 COVER_PATH       = os.path.join(DATA_ROOT, "train", "cover")
 STEGO_PATH       = os.path.join(DATA_ROOT, "train", "stego")
