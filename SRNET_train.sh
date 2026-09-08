@@ -1,12 +1,12 @@
 #!/bin/bash
-#SBATCH -c 1
-#SBATCH --mem=128G
-#SBATCH --time=48:00:00
-#SBATCH -J srnet_steganalysis
-#SBATCH -o slurm-%j.out
+#!/bin/bash
 #SBATCH -p gpu
-#SBATCH --gres="gpu:a100:1"
-
-#python3 train.py
-#python3 test.py
-python3 sanity_check_srnet.py
+#SBATCH --gres="gpu:p100:1"
+#SBATCH -c 8
+#SBATCH --mem=32G
+#SBATCH --time=48:00:00
+#SBATCH -J SrNEtTesting
+#SBATCH -o slurm-%j.out
+python3 train.py
+python3 test.py
+#python3 sanity_check_srnet.py
