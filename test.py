@@ -51,7 +51,7 @@ from model.model import Srnet
 # ──────────────────────────────────────────────────────────
 #  Config
 # ──────────────────────────────────────────────────────────
-DATA_ROOT  = "/home/p522p287/scratch/DATA/STEN_DATA_LENSLESS/STEGANALYSIS/imagenet_diffhide_amp8x"
+DATA_ROOT  = "/home/p522p287/scratch/DATA/STEN_DATA_LENSLESS/STEGANALYSIS/imagenet_diffhide_amp4x"
 COVER_PATH = os.path.join(DATA_ROOT, "test", "cover")
 STEGO_PATH = os.path.join(DATA_ROOT, "test", "stego")
 
