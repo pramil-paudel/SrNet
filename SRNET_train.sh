@@ -1,9 +1,9 @@
 #!/bin/bash
 #!/bin/bash
 #SBATCH -p gpu
-#SBATCH --gres="gpu:p100:1"
+#SBATCH --gres="gpu:a100:1"
 #SBATCH -c 8
-#SBATCH --mem=32G
+#SBATCH --mem=128G
 #SBATCH --time=48:00:00
 #SBATCH -J SrNEtTesting
 #SBATCH -o slurm-%j.out
