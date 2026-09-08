@@ -51,11 +51,20 @@ from model.model import Srnet
 # ──────────────────────────────────────────────────────────
 #  Config
 # ──────────────────────────────────────────────────────────
-DATA_ROOT  = "/home/p522p287/scratch/DATA/STEN_DATA_LENSLESS/STEGANALYSIS/imagenet_diffhide_amp4x"
+DATA_ROOT  = "/lustre/i2sl/scratch/p522p287/DATA/STEGANALYSIS/imagenet_diffhide"
 COVER_PATH = os.path.join(DATA_ROOT, "test", "cover")
 STEGO_PATH = os.path.join(DATA_ROOT, "test", "stego")
 
-CHKPT      = "./checkpoints/net_100.pt"
+# ---- Run identity ----
+# Mirrors train_srnet.py: RUN_NAME is derived from DATA_ROOT so the test
+# script automatically loads the checkpoint belonging to the dataset it is
+# evaluating. Without this, every factor shared ./checkpoints/ and the
+# wrong model could be loaded silently.
+OUTPUT_ROOT = "./runs"
+RUN_NAME    = os.path.basename(DATA_ROOT.rstrip("/"))
+RUN_DIR     = os.path.join(OUTPUT_ROOT, RUN_NAME)
+
+CHKPT      = os.path.join(RUN_DIR, "checkpoints", "net_100.pt")
 
 IMAGE_EXT       = "png"     # "png" for the generated dataset, "pgm" for the old one
 TEST_BATCH_SIZE = 40        # total images per batch (half cover, half stego)
@@ -70,7 +79,7 @@ SCALE_TO_UNIT = True
 # this consistent with it -- a mismatch costs real signal.
 RGB_TO_GRAY = "mean"        # "mean" or "luma"
 
-OUT_PREFIX = "srnet_test"
+OUT_PREFIX = os.path.join(RUN_DIR, "srnet_test")
 # ──────────────────────────────────────────────────────────
 
 
@@ -89,6 +98,8 @@ def load_gray(path):
 
 
 def main():
+    os.makedirs(RUN_DIR, exist_ok=True)
+
     # sorted() so cover and stego lists correspond; bare glob() returns
     # arbitrary filesystem order and the two lists can disagree.
     cover_names = sorted(glob(f"{COVER_PATH}/*.{IMAGE_EXT}"))
@@ -104,6 +115,7 @@ def main():
     stego_names = stego_names[:n_pairs]
 
     print("=" * 66)
+    print(f"run        : {RUN_NAME}")
     print(f"cover      : {COVER_PATH}")
     print(f"stego      : {STEGO_PATH}")
     print(f"checkpoint : {CHKPT}")

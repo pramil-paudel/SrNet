@@ -63,7 +63,7 @@ from utils.utils import (
 # Dataset produced by generate_steganalysis_dataset.py. Its layout is
 #   DATA_ROOT/{train,val,test}/{cover,stego}/NNNNNN.png
 # with filenames corresponding one-to-one across cover/ and stego/.
-DATA_ROOT = "/home/p522p287/scratch/DATA/STEN_DATA_LENSLESS/STEGANALYSIS/imagenet_diffhide_amp4x/"
+DATA_ROOT = "/lustre/i2sl/scratch/p522p287/DATA/STEGANALYSIS/imagenet_diffhide"
 
 COVER_PATH       = os.path.join(DATA_ROOT, "train", "cover")
 STEGO_PATH       = os.path.join(DATA_ROOT, "train", "stego")
@@ -75,7 +75,21 @@ VALID_STEGO_PATH = os.path.join(DATA_ROOT, "val", "stego")
 TRAIN_SIZE = None
 VAL_SIZE   = None
 
-CHECKPOINTS_DIR = "./checkpoints/"
+# ---- Run identity ----
+# Each dataset (amplification factor) gets its own output directory, so
+# runs never overwrite each other's checkpoints, curves, or logs.
+# RUN_NAME is derived from DATA_ROOT, which keeps the two in sync
+# automatically: point DATA_ROOT at the 4x dataset and outputs land in a
+# 4x run directory without a second edit to remember.
+#
+# This matters here specifically. With a shared ./checkpoints/, the 4x
+# run's net_100.pt would be silently overwritten by the next factor, and
+# test_srnet.py would then load the wrong model without complaint.
+OUTPUT_ROOT = "./runs"
+RUN_NAME    = os.path.basename(DATA_ROOT.rstrip("/"))
+RUN_DIR     = os.path.join(OUTPUT_ROOT, RUN_NAME)
+
+CHECKPOINTS_DIR = os.path.join(RUN_DIR, "checkpoints")
 
 # ---- Training ----
 BATCH_SIZE = 8
@@ -94,7 +108,8 @@ FRESH_START = True
 AUGMENT = False
 
 # Per-epoch curve log, for plotting convergence in the write-up.
-CURVE_CSV = "training_curves.csv"
+CURVE_CSV = os.path.join(RUN_DIR, "training_curves.csv")
+LOG_FILE  = os.path.join(RUN_DIR, "training.log")
 
 # On a small dataset, a working detector should overfit. Warn if training
 # accuracy has not exceeded this by CHECK_EPOCH.
@@ -138,10 +153,12 @@ for _c, _s, _name in ((COVER_PATH, STEGO_PATH, "train"),
         sys.exit(f"{_name}: cover has {_nc} images but stego has {_ns}. "
                  "Pairing would be misaligned -- regenerate the dataset.")
 
+os.makedirs(RUN_DIR, exist_ok=True)
 logging.basicConfig(
-    filename="training.log",
+    filename=LOG_FILE,
     format="%(asctime)s %(message)s",
     level=logging.DEBUG,
+    force=True,   # basicConfig may already have run during imports
 )
 
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -212,6 +229,12 @@ if __name__ == "__main__":
     # A single batch per epoch means metrics are computed over one batch
     # and the network sees a fraction of the intended data.
     print("=" * 66)
+    print("RUN")
+    print(f"  run name      : {RUN_NAME}")
+    print(f"  outputs       : {RUN_DIR}")
+    print(f"  checkpoints   : {opt.checkpoints_dir}")
+    print(f"  curves        : {CURVE_CSV}")
+    print("-" * 66)
     print("DATA")
     print(f"  root          : {DATA_ROOT}")
     print(f"  train cover   : {opt.cover_path}")
