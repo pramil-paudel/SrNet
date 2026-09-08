@@ -64,7 +64,7 @@ OUTPUT_ROOT = "./runs"
 RUN_NAME    = os.path.basename(DATA_ROOT.rstrip("/"))
 RUN_DIR     = os.path.join(OUTPUT_ROOT, RUN_NAME)
 
-CHKPT      = os.path.join(RUN_DIR, "checkpoints", "net_100.pt")
+CHKPT      = os.path.join(RUN_DIR, "net_100.pt")
 
 IMAGE_EXT       = "png"     # "png" for the generated dataset, "pgm" for the old one
 TEST_BATCH_SIZE = 40        # total images per batch (half cover, half stego)
